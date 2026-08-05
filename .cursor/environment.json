@@ -4,7 +4,8 @@
   "terminals": [
     {
       "name": "dev-server",
-      "command": "npm run dev"
+      "command": "npm run dev",
+      "description": "Vite dev server for the GardenFlow CRM app, served on http://localhost:5173"
     }
   ],
   "ports": [
