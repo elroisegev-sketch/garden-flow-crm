@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Plus, Pencil, Trash2, Mail, Phone, MapPin } from 'lucide-react'
 import { useData } from '../context/DataContext'
+import ConfirmDialog from '../components/ConfirmDialog'
 import Modal from '../components/Modal'
 import { formatDate } from '../lib/format'
 import type { Client } from '../types'
@@ -25,6 +26,7 @@ export default function Clients() {
   const { clients, jobs, addClient, updateClient, deleteClient } = useData()
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState<Client | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<Client | null>(null)
   const [form, setForm] = useState<FormState>(EMPTY)
 
   function openCreate() {
@@ -56,13 +58,25 @@ export default function Clients() {
     setOpen(false)
   }
 
-  function handleDelete(client: Client) {
+  function requestDelete(client: Client) {
+    setPendingDelete(client)
+  }
+
+  function confirmDelete() {
+    if (!pendingDelete) return
+    deleteClient(pendingDelete.id)
+    if (editing?.id === pendingDelete.id) {
+      setOpen(false)
+      setEditing(null)
+    }
+    setPendingDelete(null)
+  }
+
+  function deleteMessage(client: Client) {
     const count = jobs.filter((j) => j.clientId === client.id).length
-    const msg =
-      count > 0
-        ? `Delete ${client.name} and their ${count} job(s)?`
-        : `Delete ${client.name}?`
-    if (window.confirm(msg)) deleteClient(client.id)
+    return count > 0
+      ? `Are you sure you want to delete ${client.name} and their ${count} job(s)? This cannot be undone.`
+      : `Are you sure you want to delete ${client.name}? This cannot be undone.`
   }
 
   return (
@@ -137,7 +151,7 @@ export default function Clients() {
                   <button
                     className="btn-secondary text-red-600 hover:bg-red-50"
                     aria-label={`Delete ${client.name}`}
-                    onClick={() => handleDelete(client)}
+                    onClick={() => requestDelete(client)}
                   >
                     <Trash2 size={15} />
                   </button>
@@ -219,20 +233,41 @@ export default function Clients() {
               placeholder="Preferences, gate codes, etc."
             />
           </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={() => setOpen(false)}
-            >
-              Cancel
-            </button>
-            <button type="submit" className="btn-primary">
-              {editing ? 'Save changes' : 'Add client'}
-            </button>
+          <div
+            className={`flex gap-2 pt-2 ${editing ? 'justify-between' : 'justify-end'}`}
+          >
+            {editing && (
+              <button
+                type="button"
+                className="btn-danger"
+                onClick={() => requestDelete(editing)}
+              >
+                <Trash2 size={16} /> Delete
+              </button>
+            )}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="btn-primary">
+                {editing ? 'Save changes' : 'Add client'}
+              </button>
+            </div>
           </div>
         </form>
       </Modal>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Delete this client?"
+        message={pendingDelete ? deleteMessage(pendingDelete) : ''}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { useData } from '../context/DataContext'
+import ConfirmDialog from '../components/ConfirmDialog'
 import Modal from '../components/Modal'
 import StatusBadge from '../components/StatusBadge'
 import { formatCurrency, formatDate } from '../lib/format'
@@ -30,6 +31,7 @@ export default function Jobs() {
   const { jobs, clients, addJob, updateJob, deleteJob, clientName } = useData()
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState<Job | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<Job | null>(null)
   const [filter, setFilter] = useState<JobStatus | 'all'>('all')
   const [form, setForm] = useState<FormState>(() => emptyForm(clients[0]?.id ?? ''))
 
@@ -74,8 +76,18 @@ export default function Jobs() {
     setOpen(false)
   }
 
-  function handleDelete(job: Job) {
-    if (window.confirm(`Delete "${job.title}"?`)) deleteJob(job.id)
+  function requestDelete(job: Job) {
+    setPendingDelete(job)
+  }
+
+  function confirmDelete() {
+    if (!pendingDelete) return
+    deleteJob(pendingDelete.id)
+    if (editing?.id === pendingDelete.id) {
+      setOpen(false)
+      setEditing(null)
+    }
+    setPendingDelete(null)
   }
 
   const noClients = clients.length === 0
@@ -171,7 +183,7 @@ export default function Jobs() {
                         <button
                           className="rounded-md p-1.5 text-red-500 hover:bg-red-50"
                           aria-label={`Delete ${job.title}`}
-                          onClick={() => handleDelete(job)}
+                          onClick={() => requestDelete(job)}
                         >
                           <Trash2 size={16} />
                         </button>
@@ -285,20 +297,45 @@ export default function Jobs() {
               placeholder="Scope of work, materials, notes..."
             />
           </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={() => setOpen(false)}
-            >
-              Cancel
-            </button>
-            <button type="submit" className="btn-primary">
-              {editing ? 'Save changes' : 'Add job'}
-            </button>
+          <div
+            className={`flex gap-2 pt-2 ${editing ? 'justify-between' : 'justify-end'}`}
+          >
+            {editing && (
+              <button
+                type="button"
+                className="btn-danger"
+                onClick={() => requestDelete(editing)}
+              >
+                <Trash2 size={16} /> Delete
+              </button>
+            )}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="btn-primary">
+                {editing ? 'Save changes' : 'Add job'}
+              </button>
+            </div>
           </div>
         </form>
       </Modal>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Delete this job?"
+        message={
+          pendingDelete
+            ? `Are you sure you want to delete "${pendingDelete.title}"? This cannot be undone.`
+            : ''
+        }
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   )
 }
