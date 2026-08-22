@@ -2,16 +2,16 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { LayoutDashboard, Users, Sprout, CalendarDays, Leaf } from 'lucide-react'
 
 const NAV = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/clients', label: 'Clients', icon: Users, end: false },
-  { to: '/jobs', label: 'Jobs', icon: Sprout, end: false },
-  { to: '/schedule', label: 'Schedule', icon: CalendarDays, end: false },
+  { to: '/', label: 'לוח בקרה', icon: LayoutDashboard, end: true },
+  { to: '/clients', label: 'לקוחות', icon: Users, end: false },
+  { to: '/jobs', label: 'עבודות', icon: Sprout, end: false },
+  { to: '/schedule', label: 'יומן', icon: CalendarDays, end: false },
 ]
 
 export default function Layout() {
   return (
     <div className="flex min-h-screen">
-      <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-slate-200 bg-white sm:flex">
+      <aside className="hidden w-64 flex-shrink-0 flex-col border-e border-slate-200 bg-white sm:flex">
         <div className="flex items-center gap-2 px-6 py-5">
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white">
             <Leaf size={20} />
@@ -20,7 +20,7 @@ export default function Layout() {
             <p className="text-sm font-bold leading-tight text-slate-900">
               GardenFlow
             </p>
-            <p className="text-xs text-slate-500">Landscaping CRM</p>
+            <p className="text-xs text-slate-500">ניהול עבודות גינון</p>
           </div>
         </div>
         <nav className="flex flex-col gap-1 px-3">

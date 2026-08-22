@@ -75,27 +75,25 @@ export default function Clients() {
   function deleteMessage(client: Client) {
     const count = jobs.filter((j) => j.clientId === client.id).length
     return count > 0
-      ? `Are you sure you want to delete ${client.name} and their ${count} job(s)? This cannot be undone.`
-      : `Are you sure you want to delete ${client.name}? This cannot be undone.`
+      ? `בטוח למחוק את ${client.name} ואת ${count} העבודות שלו? אי אפשר לבטל.`
+      : `בטוח למחוק את ${client.name}? אי אפשר לבטל.`
   }
 
   return (
     <div className="mx-auto max-w-6xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Clients</h1>
-          <p className="mt-1 text-slate-500">
-            {clients.length} client{clients.length === 1 ? '' : 's'}
-          </p>
+          <h1 className="text-2xl font-bold text-slate-900">לקוחות</h1>
+          <p className="mt-1 text-slate-500">{clients.length} לקוחות</p>
         </div>
         <button className="btn-primary" onClick={openCreate}>
-          <Plus size={18} /> Add client
+          <Plus size={18} /> לקוח חדש
         </button>
       </div>
 
       {clients.length === 0 ? (
         <div className="card mt-6 p-10 text-center text-slate-500">
-          No clients yet. Add your first client to get started.
+          אין לקוחות עדיין. מוסיפים את הלקוח הראשון כדי להתחיל.
         </div>
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -146,7 +144,7 @@ export default function Clients() {
                     className="btn-secondary flex-1"
                     onClick={() => openEdit(client)}
                   >
-                    <Pencil size={15} /> Edit
+                    <Pencil size={15} /> עריכה
                   </button>
                   <button
                     className="btn-secondary text-red-600 hover:bg-red-50"
@@ -164,7 +162,7 @@ export default function Clients() {
 
       <Modal
         open={open}
-        title={editing ? 'Edit client' : 'Add client'}
+        title={editing ? 'עריכת לקוח' : 'לקוח חדש'}
         onClose={() => setOpen(false)}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -251,10 +249,10 @@ export default function Clients() {
                 className="btn-secondary"
                 onClick={() => setOpen(false)}
               >
-                Cancel
+                ביטול
               </button>
               <button type="submit" className="btn-primary">
-                {editing ? 'Save changes' : 'Add client'}
+                {editing ? 'שמירת שינויים' : 'הוספת לקוח'}
               </button>
             </div>
           </div>
@@ -263,7 +261,7 @@ export default function Clients() {
 
       <ConfirmDialog
         open={pendingDelete !== null}
-        title="Delete this client?"
+        title="למחוק את הלקוח?"
         message={pendingDelete ? deleteMessage(pendingDelete) : ''}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}

@@ -7,7 +7,7 @@ interface ModalProps {
   title: string
   onClose: () => void
   children: ReactNode
-  /** Overlay stacking class. Confirm dialogs should sit above form modals. */
+  icon?: ReactNode
   zIndexClass?: string
 }
 
@@ -16,6 +16,7 @@ export default function Modal({
   title,
   onClose,
   children,
+  icon,
   zIndexClass = 'z-50',
 }: ModalProps) {
   const titleId = useId()
@@ -38,19 +39,22 @@ export default function Modal({
       role="presentation"
     >
       <div
-        className="card w-full max-w-lg p-6 shadow-xl"
+        className="card w-full max-w-xl p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
       >
-        <div className="mb-4 flex items-center justify-between">
-          <h2 id={titleId} className="text-lg font-bold text-slate-900">
-            {title}
-          </h2>
+        <div className="mb-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {icon}
+            <h2 id={titleId} className="text-lg font-bold text-slate-900">
+              {title}
+            </h2>
+          </div>
           <button
             type="button"
-            aria-label="Close"
+            aria-label="סגירה"
             className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
             onClick={onClose}
           >

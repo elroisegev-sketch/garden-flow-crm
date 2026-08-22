@@ -18,12 +18,12 @@ export default function Schedule() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <h1 className="text-2xl font-bold text-slate-900">Schedule</h1>
-      <p className="mt-1 text-slate-500">Jobs organized by date.</p>
+      <h1 className="text-2xl font-bold text-slate-900">יומן</h1>
+      <p className="mt-1 text-slate-500">עבודות לפי תאריך.</p>
 
       {dates.length === 0 ? (
         <div className="card mt-6 p-10 text-center text-slate-500">
-          Nothing scheduled yet.
+          עדיין אין עבודות ביומן.
         </div>
       ) : (
         <div className="mt-6 space-y-6">

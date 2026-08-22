@@ -15,8 +15,8 @@ export default function ConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = 'Delete',
-  cancelLabel = 'Cancel',
+  confirmLabel = 'מחיקה',
+  cancelLabel = 'ביטול',
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -28,7 +28,6 @@ export default function ConfirmDialog({
       event.stopImmediatePropagation()
       onCancel()
     }
-    // Capture so this dialog wins over the form modal underneath.
     window.addEventListener('keydown', onKey, true)
     return () => window.removeEventListener('keydown', onKey, true)
   }, [open, onCancel])
@@ -36,12 +35,12 @@ export default function ConfirmDialog({
   return (
     <Modal open={open} title={title} onClose={onCancel} zIndexClass="z-[80]">
       <p className="text-sm text-slate-600">{message}</p>
-      <div className="mt-6 flex justify-end gap-2">
-        <button type="button" className="btn-secondary" onClick={onCancel}>
-          {cancelLabel}
-        </button>
+      <div className="mt-6 flex justify-start gap-2">
         <button type="button" className="btn-danger" onClick={onConfirm} autoFocus>
           {confirmLabel}
+        </button>
+        <button type="button" className="btn-secondary" onClick={onCancel}>
+          {cancelLabel}
         </button>
       </div>
     </Modal>

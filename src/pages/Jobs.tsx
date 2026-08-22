@@ -1,18 +1,27 @@
 import { useState } from 'react'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { CalendarDays, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useData } from '../context/DataContext'
 import ConfirmDialog from '../components/ConfirmDialog'
 import Modal from '../components/Modal'
 import StatusBadge from '../components/StatusBadge'
-import { formatCurrency, formatDate } from '../lib/format'
-import { JOB_STATUSES, type Job, type JobStatus } from '../types'
+import { formatDate } from '../lib/format'
+import {
+  JOB_STATUSES,
+  JOB_TYPES,
+  type Job,
+  type JobStatus,
+  type JobType,
+} from '../types'
 
 interface FormState {
   title: string
   clientId: string
+  jobType: JobType
+  assignee: string
   status: JobStatus
   scheduledDate: string
-  price: string
+  scheduledTime: string
+  address: string
   description: string
 }
 
@@ -20,9 +29,12 @@ function emptyForm(clientId: string): FormState {
   return {
     title: '',
     clientId,
-    status: 'lead',
+    jobType: 'monthly_maintenance',
+    assignee: '',
+    status: 'scheduled',
     scheduledDate: new Date().toISOString().slice(0, 10),
-    price: '',
+    scheduledTime: '08:00',
+    address: '',
     description: '',
   }
 }
@@ -49,9 +61,12 @@ export default function Jobs() {
     setForm({
       title: job.title,
       clientId: job.clientId,
+      jobType: job.jobType,
+      assignee: job.assignee,
       status: job.status,
       scheduledDate: job.scheduledDate,
-      price: String(job.price),
+      scheduledTime: job.scheduledTime,
+      address: job.address,
       description: job.description,
     })
     setOpen(true)
@@ -63,9 +78,13 @@ export default function Jobs() {
     const payload = {
       title: form.title,
       clientId: form.clientId,
+      jobType: form.jobType,
+      assignee: form.assignee,
       status: form.status,
       scheduledDate: form.scheduledDate,
-      price: Number(form.price) || 0,
+      scheduledTime: form.scheduledTime,
+      address: form.address,
+      price: Number(form.description) || 0,
       description: form.description,
     }
     if (editing) {
@@ -96,13 +115,13 @@ export default function Jobs() {
     <div className="mx-auto max-w-6xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Jobs</h1>
+          <h1 className="text-2xl font-bold text-slate-900">עבודות</h1>
           <p className="mt-1 text-slate-500">
-            {jobs.length} job{jobs.length === 1 ? '' : 's'} in your pipeline
+            {jobs.length} עבודות בצינור
           </p>
         </div>
         <button className="btn-primary" onClick={openCreate} disabled={noClients}>
-          <Plus size={18} /> Add job
+          <Plus size={18} /> עבודה חדשה
         </button>
       </div>
 
@@ -110,7 +129,7 @@ export default function Jobs() {
         {(['all', ...JOB_STATUSES.map((s) => s.value)] as const).map((value) => {
           const label =
             value === 'all'
-              ? 'All'
+              ? 'הכל'
               : JOB_STATUSES.find((s) => s.value === value)?.label
           const active = filter === value
           return (
@@ -131,26 +150,25 @@ export default function Jobs() {
 
       {noClients && (
         <div className="card mt-6 p-6 text-center text-sm text-slate-500">
-          Add a client first, then you can create jobs for them.
+          קודם מוסיפים לקוח, ואז אפשר לפתוח לו עבודה.
         </div>
       )}
 
       <div className="mt-4 card overflow-hidden">
         {visible.length === 0 ? (
           <p className="px-5 py-10 text-center text-sm text-slate-500">
-            No jobs to show.
+            אין עבודות להצגה.
           </p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+            <table className="w-full text-right text-sm">
+              <thead className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500">
                 <tr>
-                  <th className="px-5 py-3">Job</th>
-                  <th className="px-5 py-3">Client</th>
-                  <th className="px-5 py-3">Date</th>
-                  <th className="px-5 py-3">Price</th>
-                  <th className="px-5 py-3">Status</th>
-                  <th className="px-5 py-3 text-right">Actions</th>
+                  <th className="px-5 py-3">עבודה</th>
+                  <th className="px-5 py-3">לקוח</th>
+                  <th className="px-5 py-3">תאריך</th>
+                  <th className="px-5 py-3">סטטוס</th>
+                  <th className="px-5 py-3 text-left">פעולות</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -164,25 +182,23 @@ export default function Jobs() {
                     </td>
                     <td className="px-5 py-3 text-slate-600">
                       {formatDate(job.scheduledDate)}
-                    </td>
-                    <td className="px-5 py-3 font-semibold text-slate-700">
-                      {formatCurrency(job.price)}
+                      {job.scheduledTime ? ` · ${job.scheduledTime}` : ''}
                     </td>
                     <td className="px-5 py-3">
                       <StatusBadge status={job.status} />
                     </td>
                     <td className="px-5 py-3">
-                      <div className="flex justify-end gap-1">
+                      <div className="flex justify-start gap-1">
                         <button
                           className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
-                          aria-label={`Edit ${job.title}`}
+                          aria-label={`עריכת ${job.title}`}
                           onClick={() => openEdit(job)}
                         >
                           <Pencil size={16} />
                         </button>
                         <button
                           className="rounded-md p-1.5 text-red-500 hover:bg-red-50"
-                          aria-label={`Delete ${job.title}`}
+                          aria-label={`מחיקת ${job.title}`}
                           onClick={() => requestDelete(job)}
                         >
                           <Trash2 size={16} />
@@ -199,26 +215,18 @@ export default function Jobs() {
 
       <Modal
         open={open}
-        title={editing ? 'Edit job' : 'Add job'}
+        title={editing ? 'עריכת עבודה' : 'עבודה חדשה'}
         onClose={() => setOpen(false)}
+        icon={
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-600 text-white">
+            <CalendarDays size={18} />
+          </span>
+        }
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="label" htmlFor="job-title">
-              Job title
-            </label>
-            <input
-              id="job-title"
-              className="input"
-              value={form.title}
-              autoFocus
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              placeholder="Backyard redesign"
-            />
-          </div>
-          <div>
             <label className="label" htmlFor="job-client">
-              Client
+              לקוח
             </label>
             <select
               id="job-client"
@@ -233,29 +241,54 @@ export default function Jobs() {
               ))}
             </select>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div>
-              <label className="label" htmlFor="job-status">
-                Status
-              </label>
-              <select
-                id="job-status"
-                className="input"
-                value={form.status}
-                onChange={(e) =>
-                  setForm({ ...form, status: e.target.value as JobStatus })
-                }
-              >
-                {JOB_STATUSES.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div>
+            <label className="label" htmlFor="job-title">
+              כותרת העבודה
+            </label>
+            <input
+              id="job-title"
+              className="input"
+              value={form.title}
+              autoFocus
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              placeholder="ניקוי"
+            />
+          </div>
+          <div>
+            <label className="label" htmlFor="job-type">
+              סוג עבודה
+            </label>
+            <select
+              id="job-type"
+              className="input"
+              value={form.jobType}
+              onChange={(e) =>
+                setForm({ ...form, jobType: e.target.value as JobType })
+              }
+            >
+              {JOB_TYPES.map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="label" htmlFor="job-assignee">
+              אחראי ביצוע
+            </label>
+            <input
+              id="job-assignee"
+              className="input"
+              value={form.assignee}
+              onChange={(e) => setForm({ ...form, assignee: e.target.value })}
+              placeholder="אלרועי + אמיתי"
+            />
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="label" htmlFor="job-date">
-                Date
+                תאריך
               </label>
               <input
                 id="job-date"
@@ -268,23 +301,54 @@ export default function Jobs() {
               />
             </div>
             <div>
-              <label className="label" htmlFor="job-price">
-                Price ($)
+              <label className="label" htmlFor="job-time">
+                שעה
               </label>
               <input
-                id="job-price"
-                type="number"
-                min="0"
+                id="job-time"
+                type="time"
                 className="input"
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: e.target.value })}
-                placeholder="1200"
+                value={form.scheduledTime}
+                onChange={(e) =>
+                  setForm({ ...form, scheduledTime: e.target.value })
+                }
               />
             </div>
           </div>
           <div>
+            <label className="label" htmlFor="job-address">
+              כתובת / מיקום
+            </label>
+            <input
+              id="job-address"
+              className="input"
+              value={form.address}
+              onChange={(e) => setForm({ ...form, address: e.target.value })}
+              placeholder="רעננה"
+            />
+          </div>
+          <div>
+            <label className="label" htmlFor="job-status">
+              סטטוס
+            </label>
+            <select
+              id="job-status"
+              className="input"
+              value={form.status}
+              onChange={(e) =>
+                setForm({ ...form, status: e.target.value as JobStatus })
+              }
+            >
+              {JOB_STATUSES.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
             <label className="label" htmlFor="job-description">
-              Description
+              הערות
             </label>
             <textarea
               id="job-description"
@@ -294,43 +358,34 @@ export default function Jobs() {
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })
               }
-              placeholder="Scope of work, materials, notes..."
             />
           </div>
-          <div
-            className={`flex gap-2 pt-2 ${editing ? 'justify-between' : 'justify-end'}`}
-          >
-            {editing && (
+          <div className="flex items-center justify-between pt-2">
+            {editing ? (
               <button
                 type="button"
-                className="btn-danger"
+                className="rounded-lg border border-red-300 bg-white p-2.5 text-red-600 hover:bg-red-50"
+                aria-label="מחיקת עבודה"
                 onClick={() => requestDelete(editing)}
               >
-                <Trash2 size={16} /> Delete
+                <Trash2 size={18} />
               </button>
+            ) : (
+              <span />
             )}
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={() => setOpen(false)}
-              >
-                Cancel
-              </button>
-              <button type="submit" className="btn-primary">
-                {editing ? 'Save changes' : 'Add job'}
-              </button>
-            </div>
+            <button type="submit" className="btn-primary">
+              {editing ? 'שמירת שינויים' : 'הוספת עבודה'}
+            </button>
           </div>
         </form>
       </Modal>
 
       <ConfirmDialog
         open={pendingDelete !== null}
-        title="Delete this job?"
+        title="למחוק את העבודה?"
         message={
           pendingDelete
-            ? `Are you sure you want to delete "${pendingDelete.title}"? This cannot be undone.`
+            ? `בטוח למחוק את "${pendingDelete.title}"? אי אפשר לבטל.`
             : ''
         }
         onConfirm={confirmDelete}

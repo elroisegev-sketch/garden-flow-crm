@@ -8,10 +8,10 @@ const STYLES: Record<JobStatus, string> = {
 }
 
 const LABELS: Record<JobStatus, string> = {
-  lead: 'Lead',
-  scheduled: 'Scheduled',
-  in_progress: 'In Progress',
-  completed: 'Completed',
+  lead: 'ליד',
+  scheduled: 'מתוזמן',
+  in_progress: 'בביצוע',
+  completed: 'הושלם',
 }
 
 export default function StatusBadge({ status }: { status: JobStatus }) {
