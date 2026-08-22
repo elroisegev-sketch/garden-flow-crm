@@ -42,32 +42,30 @@ export default function Dashboard() {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-      <p className="mt-1 text-slate-500">
-        Your landscaping business at a glance.
-      </p>
+      <h1 className="text-2xl font-bold text-slate-900">לוח בקרה</h1>
+      <p className="mt-1 text-slate-500">מבט מהיר על העבודות והלקוחות.</p>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Clients"
+          label="לקוחות"
           value={String(clients.length)}
           icon={Users}
           accent="bg-blue-100 text-blue-700"
         />
         <StatCard
-          label="Active jobs"
+          label="עבודות פעילות"
           value={String(activeJobs.length)}
           icon={Sprout}
           accent="bg-amber-100 text-amber-700"
         />
         <StatCard
-          label="Pipeline value"
+          label="שווי צנרת"
           value={formatCurrency(pipeline)}
           icon={DollarSign}
           accent="bg-brand-100 text-brand-700"
         />
         <StatCard
-          label="Total jobs"
+          label="סה״כ עבודות"
           value={String(jobs.length)}
           icon={CalendarClock}
           accent="bg-purple-100 text-purple-700"
@@ -76,11 +74,11 @@ export default function Dashboard() {
 
       <div className="mt-8 card">
         <div className="border-b border-slate-200 px-5 py-4">
-          <h2 className="font-semibold text-slate-900">Upcoming jobs</h2>
+          <h2 className="font-semibold text-slate-900">עבודות קרובות</h2>
         </div>
         {upcoming.length === 0 ? (
           <p className="px-5 py-8 text-center text-sm text-slate-500">
-            No upcoming jobs scheduled.
+            אין עבודות קרובות.
           </p>
         ) : (
           <ul className="divide-y divide-slate-100">

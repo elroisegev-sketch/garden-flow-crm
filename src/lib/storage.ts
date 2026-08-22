@@ -1,7 +1,7 @@
-import type { Client, Job } from '../types'
+import type { Client, Job, JobType } from '../types'
 
-const CLIENTS_KEY = 'gardenflow.clients'
-const JOBS_KEY = 'gardenflow.jobs'
+const CLIENTS_KEY = 'gardenflow.v2.clients'
+const JOBS_KEY = 'gardenflow.v2.jobs'
 
 export function uid(): string {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36)
@@ -20,6 +20,16 @@ function write<T>(key: string, value: T[]): void {
   localStorage.setItem(key, JSON.stringify(value))
 }
 
+function normalizeJob(job: Job): Job {
+  return {
+    ...job,
+    jobType: (job.jobType ?? 'other') as JobType,
+    assignee: job.assignee ?? '',
+    scheduledTime: job.scheduledTime ?? '08:00',
+    address: job.address ?? '',
+  }
+}
+
 export function loadClients(): Client[] {
   return read<Client>(CLIENTS_KEY) ?? seedClients()
 }
@@ -29,89 +39,64 @@ export function saveClients(clients: Client[]): void {
 }
 
 export function loadJobs(): Job[] {
-  return read<Job>(JOBS_KEY) ?? seedJobs()
+  const stored = read<Job>(JOBS_KEY)
+  if (!stored) return seedJobs()
+  return stored.map(normalizeJob)
 }
 
 export function saveJobs(jobs: Job[]): void {
   write(JOBS_KEY, jobs)
 }
 
-function daysFromNow(days: number): string {
-  const d = new Date()
-  d.setDate(d.getDate() + days)
-  return d.toISOString().slice(0, 10)
-}
-
 const SEED_CLIENTS: Client[] = [
   {
+    id: 'c-rubi',
+    name: 'רובי לוי',
+    email: 'rubi@example.com',
+    phone: '050-0000000',
+    address: 'רעננה',
+    notes: '',
+    createdAt: '2026-08-01T00:00:00.000Z',
+  },
+  {
     id: 'c-oakview',
-    name: 'Oakview Residence',
-    email: 'hello@oakview.com',
-    phone: '(555) 210-4433',
-    address: '18 Oakview Lane, Portland, OR',
-    notes: 'Large backyard, wants a native pollinator garden.',
-    createdAt: daysFromNow(-40),
-  },
-  {
-    id: 'c-riverside',
-    name: 'Riverside Cafe',
-    email: 'manager@riversidecafe.com',
-    phone: '(555) 887-1200',
-    address: '42 River St, Portland, OR',
-    notes: 'Commercial patio planters, monthly maintenance.',
-    createdAt: daysFromNow(-25),
-  },
-  {
-    id: 'c-hensley',
-    name: 'Hensley Family',
-    email: 'j.hensley@example.com',
-    phone: '(555) 664-9821',
-    address: '7 Maple Court, Beaverton, OR',
-    notes: 'New sod install plus irrigation.',
-    createdAt: daysFromNow(-10),
+    name: 'משפחת כהן',
+    email: 'cohen@example.com',
+    phone: '052-1112233',
+    address: 'הרצליה',
+    notes: '',
+    createdAt: '2026-07-20T00:00:00.000Z',
   },
 ]
 
 const SEED_JOBS: Job[] = [
   {
-    id: 'j-1',
-    title: 'Pollinator garden design',
+    id: 'j-rubi-clean',
+    title: 'ניקוי',
+    clientId: 'c-rubi',
+    status: 'scheduled',
+    jobType: 'monthly_maintenance',
+    assignee: 'אלרועי + אמיתי',
+    scheduledDate: '2026-08-25',
+    scheduledTime: '07:00',
+    address: 'רעננה',
+    price: 400,
+    description: '400',
+    createdAt: '2026-08-20T00:00:00.000Z',
+  },
+  {
+    id: 'j-cohen-prune',
+    title: 'גיזום עצים',
     clientId: 'c-oakview',
     status: 'in_progress',
-    scheduledDate: daysFromNow(2),
-    price: 3200,
-    description: 'Design and plant a native pollinator bed along the back fence.',
-    createdAt: daysFromNow(-12),
-  },
-  {
-    id: 'j-2',
-    title: 'Patio planter refresh',
-    clientId: 'c-riverside',
-    status: 'scheduled',
-    scheduledDate: daysFromNow(5),
+    jobType: 'pruning',
+    assignee: 'אלרועי',
+    scheduledDate: '2026-08-24',
+    scheduledTime: '08:30',
+    address: 'הרצליה',
     price: 850,
-    description: 'Seasonal replant of 12 patio planters with fall annuals.',
-    createdAt: daysFromNow(-6),
-  },
-  {
-    id: 'j-3',
-    title: 'Sod + irrigation install',
-    clientId: 'c-hensley',
-    status: 'lead',
-    scheduledDate: daysFromNow(9),
-    price: 5400,
-    description: 'Front and back sod install with a 6-zone drip system.',
-    createdAt: daysFromNow(-3),
-  },
-  {
-    id: 'j-4',
-    title: 'Spring cleanup',
-    clientId: 'c-oakview',
-    status: 'completed',
-    scheduledDate: daysFromNow(-15),
-    price: 620,
-    description: 'Bed cleanup, mulch, and pruning.',
-    createdAt: daysFromNow(-30),
+    description: '',
+    createdAt: '2026-08-18T00:00:00.000Z',
   },
 ]
 

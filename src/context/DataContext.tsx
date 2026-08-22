@@ -91,7 +91,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const clientName = useCallback(
-    (id: string) => clients.find((c) => c.id === id)?.name ?? 'Unknown client',
+    (id: string) => clients.find((c) => c.id === id)?.name ?? 'לקוח לא ידוע',
     [clients],
   )
 

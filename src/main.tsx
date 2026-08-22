@@ -7,7 +7,7 @@ import { DataProvider } from './context/DataContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
       <DataProvider>
         <App />
       </DataProvider>
