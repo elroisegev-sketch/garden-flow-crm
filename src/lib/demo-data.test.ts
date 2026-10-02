@@ -1,0 +1,24 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { buildViennaDemo } from "./demo-data";
+
+test("vienna demo links every file and favorite the airport set", () => {
+  const demo = buildViennaDemo();
+  assert.equal(demo.trip.destination, "Vienna");
+  assert.equal(demo.trip.startDate, "2026-10-04");
+  assert.equal(demo.trip.endDate, "2026-10-08");
+  assert.deepEqual(demo.travelers.map((traveler) => traveler.nameEn), ["Elroi", "Lior"]);
+  const fileIds = new Set(demo.fileSpecs.map((spec) => spec.fileId));
+  for (const document of demo.documents) {
+    if (document.fileId) assert.ok(fileIds.has(document.fileId), document.id);
+  }
+  const favorites = demo.documents.filter((document) => document.favorite).map((document) => document.title);
+  for (const title of ["Passport – Elroi", "Boarding Pass – Elroi", "Hotel Reservation", "Travel Insurance", "Car Voucher"]) {
+    assert.ok(favorites.includes(title), title);
+  }
+  const tuesday = demo.activities.filter((activity) => activity.dayId.endsWith("2026-10-06")).map((activity) => activity.title);
+  assert.deepEqual(tuesday, ["Breakfast", "Pick up / leave Vienna", "Lunzer See", "Walk", "Picnic", "Coffee", "Return Vienna"]);
+  assert.equal(demo.flights[0]?.fromCode, "TLV");
+  assert.equal(demo.flights[1]?.fromCode, "VIE");
+  assert.equal(demo.checklist.length, 26);
+});

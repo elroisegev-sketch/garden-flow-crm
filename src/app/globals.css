@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f4f1eb;
+  --color-ink: #1c1917;
+  --color-muted: #746d64;
+  --color-line: #e6e0d6;
+  --color-card: #ffffff;
+  --color-navy: #14283a;
+  --color-navy-2: #1d3e58;
+  --color-gold: #a68456;
+  --color-gold-soft: #f4ecdf;
+  --color-danger: #9f2d3a;
+  --color-ok: #1c7a4d;
+  --color-ok-soft: #e7f5ee;
+  --font-sans: var(--font-heebo), "Arial Hebrew", sans-serif;
+  --shadow-card: 0 10px 30px rgba(20, 40, 58, 0.06);
+}
+
+html {
+  background: #e4dfd6;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: #e4dfd6;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  touch-action: manipulation;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 0.35s ease both;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+
+.shake {
+  animation: shake 0.28s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .shake {
+    animation: none;
+  }
+}
