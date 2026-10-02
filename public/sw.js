@@ -1,5 +1,18 @@
-const CACHE = "travel-vault-shell-v1";
-const PRECACHE = ["/", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png", "/icons/maskable-512.png"];
+const CACHE = "travel-vault-shell-v2";
+const PRECACHE = [
+  "/",
+  "/manifest.webmanifest",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/apple-touch-icon.png",
+  "/icons/maskable-512.png",
+  "/vault/boarding-elroi.pdf",
+  "/vault/boarding-lior.pdf",
+  "/vault/confirmation-elroi.pdf",
+  "/vault/confirmation-lior.pdf",
+  "/vault/archive-elroi-11oct.pdf",
+  "/vault/archive-lior-11oct.pdf",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)).then(() => self.skipWaiting()));
@@ -17,7 +30,7 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/") || url.pathname.endsWith(".mjs") || url.pathname.endsWith(".png") || url.pathname.endsWith(".webmanifest")) {
+  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/") || url.pathname.startsWith("/vault/") || url.pathname.endsWith(".mjs") || url.pathname.endsWith(".png") || url.pathname.endsWith(".pdf") || url.pathname.endsWith(".webmanifest")) {
     event.respondWith(cacheFirst(request));
     return;
   }

@@ -52,7 +52,11 @@ export function FlightsScreen() {
               ))}
               {!passes.length ? <p className="text-sm text-muted">{flight.direction === "return" ? "כרטיס עלייה לחזור עדיין לא הונפק. הפרטים כאן הם מאישור ההזמנה." : "צרפו כרטיסי עלייה בעריכת הטיסה."}</p> : null}
             </div>
-            {flight.reservationDocumentId ? <Link href={`/documents/${flight.reservationDocumentId}`} className="flex h-12 items-center justify-center rounded-2xl bg-white font-semibold shadow-card">אישור הזמנה</Link> : null}
+            <div className="space-y-2">
+              {documents.filter((document) => document.type === "flight-reservation" && document.bookingNumber === flight.confirmationNumber && !document.title.startsWith("ארכיון")).map((document) => (
+                <Link key={document.id} href={`/present/${document.id}`} className="flex h-12 items-center justify-center rounded-2xl bg-white font-semibold shadow-card">{document.title}</Link>
+              ))}
+            </div>
             {flight.notes ? <p className="text-sm leading-6 text-muted">{flight.notes}</p> : null}
           </Card>
         );

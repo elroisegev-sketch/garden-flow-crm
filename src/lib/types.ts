@@ -225,4 +225,5 @@ export interface DemoFileSpec {
   kicker: string;
   lines: string[];
   accent: string;
+  assetPath?: string;
 }

@@ -25,6 +25,16 @@ test("vienna demo links every file and favorite the airport set", () => {
   assert.equal(demo.flights[1]?.arrivalDate, "2026-10-09");
   assert.equal(demo.flights[1]?.boardingPassDocumentIds.length, 0);
   assert.equal(demo.documents.some((document) => document.id === "doc-flight-archive"), true);
+  assert.equal(demo.documents.some((document) => document.id === "doc-flight-lior"), true);
+  assert.equal(demo.documents.some((document) => document.id === "doc-archive-lior"), true);
+  const boarding = demo.documents.find((document) => document.id === "doc-bp-elroi-out");
+  assert.equal(boarding?.fileType, "application/pdf");
+  assert.equal(demo.fileSpecs.find((spec) => spec.fileId === boarding?.fileId)?.assetPath, "/vault/boarding-elroi.pdf");
+  for (const fileId of ["file-bp-lior-out", "file-flight-out", "file-flight-lior", "file-flight-archive", "file-archive-lior"]) {
+    const spec = demo.fileSpecs.find((item) => item.fileId === fileId);
+    assert.equal(spec?.mime, "application/pdf");
+    assert.match(spec?.assetPath ?? "", /^\/vault\/.+\.pdf$/);
+  }
   assert.equal(demo.activities.find((activity) => activity.id === "act-dep")?.time, "06:40");
   assert.equal(demo.checklist.length, 26);
 });
