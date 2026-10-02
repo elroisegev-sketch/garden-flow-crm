@@ -96,7 +96,7 @@ function drawBoarding(context: CanvasRenderingContext2D, spec: DemoFileSpec, fon
   }
   context.fillStyle = "#9f2d3a";
   context.font = `700 28px ${font}`;
-  context.fillText("DEMO", 80, 1188);
+  context.fillText("Summary only, not a gate barcode", 80, 1188);
 }
 
 async function drawQr(context: CanvasRenderingContext2D) {

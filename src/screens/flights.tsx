@@ -38,7 +38,7 @@ export function FlightsScreen() {
               { label: "Airline", value: flight.airline },
               { label: "Flight Number", value: flight.flightNumber },
               { label: "Departure Time", value: flight.departureTime },
-              { label: "Arrival", value: flight.arrivalTime },
+              { label: "Arrival", value: flight.arrivalDate && flight.arrivalDate !== flight.date ? `${formatDot(flight.arrivalDate)} ${flight.arrivalTime}` : flight.arrivalTime },
               { label: "Terminal", value: flight.departureTerminal },
               { label: "Seat", value: flight.seats.filter((seat) => seat.seat).map((seat) => `${ownerLabel(travelers, seat.travelerId)}\u2066${seat.seat}\u2069`).join(" · ") },
               { label: "Baggage", value: flight.baggage },
@@ -50,8 +50,9 @@ export function FlightsScreen() {
                   <span dir="ltr">Open Boarding Pass · {ownerLabel(travelers, document.travelerId)}</span>
                 </Link>
               ))}
-              {!passes.length ? <p className="text-sm text-muted">צרפו כרטיסי עלייה בעריכת הטיסה.</p> : null}
+              {!passes.length ? <p className="text-sm text-muted">{flight.direction === "return" ? "כרטיס עלייה לחזור עדיין לא הונפק. הפרטים כאן הם מאישור ההזמנה." : "צרפו כרטיסי עלייה בעריכת הטיסה."}</p> : null}
             </div>
+            {flight.reservationDocumentId ? <Link href={`/documents/${flight.reservationDocumentId}`} className="flex h-12 items-center justify-center rounded-2xl bg-white font-semibold shadow-card">אישור הזמנה</Link> : null}
             {flight.notes ? <p className="text-sm leading-6 text-muted">{flight.notes}</p> : null}
           </Card>
         );
@@ -80,6 +81,7 @@ export function FlightFormScreen({ id }: { id?: string }) {
     flightNumber: "",
     departureTime: "",
     arrivalTime: "",
+    arrivalDate: formatIso(new Date()),
     departureTerminal: "",
     arrivalTerminal: "",
     baggage: "",
@@ -140,6 +142,7 @@ function FlightEditor({
       <div className="grid grid-cols-2 gap-3">
         <Field label="המראה"><TextInput type="time" value={flight.departureTime} onChange={(event) => setFlight({ ...flight, departureTime: event.target.value })} /></Field>
         <Field label="נחיתה"><TextInput type="time" value={flight.arrivalTime} onChange={(event) => setFlight({ ...flight, arrivalTime: event.target.value })} /></Field>
+        <Field label="תאריך נחיתה"><TextInput type="date" value={flight.arrivalDate || flight.date} onChange={(event) => setFlight({ ...flight, arrivalDate: event.target.value })} /></Field>
         <Field label="טרמינל יציאה"><TextInput value={flight.departureTerminal} onChange={(event) => setFlight({ ...flight, departureTerminal: event.target.value })} /></Field>
         <Field label="טרמינל הגעה"><TextInput value={flight.arrivalTerminal} onChange={(event) => setFlight({ ...flight, arrivalTerminal: event.target.value })} /></Field>
       </div>

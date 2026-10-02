@@ -18,7 +18,13 @@ test("vienna demo links every file and favorite the airport set", () => {
   }
   const tuesday = demo.activities.filter((activity) => activity.dayId.endsWith("2026-10-06")).map((activity) => activity.title);
   assert.deepEqual(tuesday, ["Breakfast", "Pick up / leave Vienna", "Lunzer See", "Walk", "Picnic", "Coffee", "Return Vienna"]);
-  assert.equal(demo.flights[0]?.fromCode, "TLV");
-  assert.equal(demo.flights[1]?.fromCode, "VIE");
+  assert.equal(demo.flights[0]?.flightNumber, "LY 361");
+  assert.equal(demo.flights[0]?.seats[0]?.seat, "46K");
+  assert.equal(demo.flights[0]?.seats[1]?.seat, "46J");
+  assert.equal(demo.flights[1]?.flightNumber, "LY 364");
+  assert.equal(demo.flights[1]?.arrivalDate, "2026-10-09");
+  assert.equal(demo.flights[1]?.boardingPassDocumentIds.length, 0);
+  assert.equal(demo.documents.some((document) => document.id === "doc-flight-archive"), true);
+  assert.equal(demo.activities.find((activity) => activity.id === "act-dep")?.time, "06:40");
   assert.equal(demo.checklist.length, 26);
 });

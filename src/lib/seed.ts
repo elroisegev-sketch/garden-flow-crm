@@ -20,6 +20,7 @@ async function seedVault(): Promise<void> {
   if (existing) {
     const settings = await db.settings.get("security");
     if (!settings) await db.settings.put(defaultSettings(existing.id));
+    await replacePlaceholderFlights();
     return;
   }
   const demo = buildViennaDemo();
@@ -50,6 +51,37 @@ async function seedVault(): Promise<void> {
     await db.activities.bulkAdd(demo.activities);
     await db.checklist.bulkAdd(demo.checklist);
     await db.settings.put(defaultSettings(demo.trip.id));
+  });
+}
+
+async function replacePlaceholderFlights(): Promise<void> {
+  const outbound = await db.flights.get("flight-out");
+  if (!outbound || !outbound.flightNumber.includes("353")) return;
+  const demo = buildViennaDemo();
+  const specIds = new Set(["file-flight-out", "file-bp-elroi-out", "file-bp-lior-out", "file-flight-archive"]);
+  const files: VaultFile[] = [];
+  for (const spec of demo.fileSpecs.filter((spec) => specIds.has(spec.fileId))) {
+    const current = await db.files.get(spec.fileId);
+    if (current?.encrypted) continue;
+    const blob = await renderDemoFile(spec);
+    files.push({
+      id: spec.fileId,
+      mime: spec.mime,
+      encrypted: false,
+      ivB64: null,
+      bytes: await blob.arrayBuffer(),
+      createdAt: demo.trip.createdAt,
+    });
+  }
+  const documentIds = new Set(["doc-flight-out", "doc-bp-elroi-out", "doc-bp-lior-out", "doc-flight-archive"]);
+  const activityIds = new Set(["act-dep", "act-land", "act-return-flight"]);
+  await db.transaction("rw", [db.documents, db.files, db.flights, db.activities], async () => {
+    await db.documents.bulkDelete(["doc-bp-elroi-ret", "doc-bp-lior-ret"]);
+    await db.files.bulkDelete(["file-bp-elroi-ret", "file-bp-lior-ret"]);
+    await db.documents.bulkPut(demo.documents.filter((document) => documentIds.has(document.id)));
+    await db.files.bulkPut(files);
+    await db.flights.bulkPut(demo.flights);
+    await db.activities.bulkPut(demo.activities.filter((activity) => activityIds.has(activity.id)));
   });
 }
 

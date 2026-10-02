@@ -70,6 +70,7 @@ export interface Flight {
   flightNumber: string;
   departureTime: string;
   arrivalTime: string;
+  arrivalDate: IsoDate;
   departureTerminal: string;
   arrivalTerminal: string;
   baggage: string;
